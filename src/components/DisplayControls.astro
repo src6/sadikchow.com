@@ -1,0 +1,105 @@
+<div class="display-controls" aria-label="Display controls">
+  <button id="mode-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle mode">
+    <span class="icon-wrap" aria-hidden="true"></span>
+  </button>
+</div>
+
+<script is:inline>
+  (() => {
+    const storageKey = "theme";
+    const root = document.documentElement;
+    const body = document.body;
+    const toggle = document.getElementById("mode-toggle");
+
+    const normalizeTheme = (value) => {
+      if (value === "kanagawa-dragon") return "dragon-dark";
+      if (value === "default") return "dragon-light";
+      if (value === "dragon-dark" || value === "dragon-light") return value;
+      return "dragon-light";
+    };
+
+    const readStoredTheme = () => {
+      try {
+        return normalizeTheme(localStorage.getItem(storageKey));
+      } catch {
+        return "dragon-light";
+      }
+    };
+
+    const writeStoredTheme = (theme) => {
+      try {
+        localStorage.setItem(storageKey, theme);
+      } catch {
+        return;
+      }
+    };
+
+    const applyTheme = (theme) => {
+      root.dataset.theme = theme;
+      body?.setAttribute("data-theme", theme);
+    };
+
+    const sunIcon =
+      '<svg viewBox="0 0 24 24" role="img" focusable="false"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.4M12 18.8v2.4M21.2 12h-2.4M5.2 12H2.8M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2L5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    const moonIcon =
+      '<svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M15.8 3.6a8.7 8.7 0 1 0 4.6 15.4A9.4 9.4 0 0 1 15.8 3.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    const updateButtonLabel = (theme) => {
+      if (!(toggle instanceof HTMLButtonElement)) return;
+      const isDark = theme === "dragon-dark";
+      const icon = toggle.querySelector(".icon-wrap");
+      if (icon) {
+        icon.innerHTML = isDark ? moonIcon : sunIcon;
+      }
+      toggle.setAttribute("title", isDark ? "Switch to light mode" : "Switch to dark mode");
+      toggle.setAttribute("aria-pressed", String(isDark));
+    };
+
+    const setTheme = (value) => {
+      const theme = normalizeTheme(value);
+      applyTheme(theme);
+      writeStoredTheme(theme);
+      updateButtonLabel(theme);
+      return theme;
+    };
+
+    let activeTheme = setTheme(root.dataset.theme || readStoredTheme());
+
+    if (toggle instanceof HTMLButtonElement) {
+      toggle.addEventListener("click", () => {
+        activeTheme = activeTheme === "dragon-dark" ? "dragon-light" : "dragon-dark";
+        activeTheme = setTheme(activeTheme);
+      });
+    }
+  })();
+</script>
+
+<style>
+  .display-controls {
+    display: flex;
+    align-items: center;
+  }
+
+  #mode-toggle {
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 2px;
+    width: 1.65rem;
+    height: 1.65rem;
+    line-height: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .icon-wrap {
+    display: inline-flex;
+    width: 0.86rem;
+    height: 0.86rem;
+  }
+
+  .icon-wrap :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+</style>

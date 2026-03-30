@@ -1,0 +1,32 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import ExamCountdownList from "../components/ExamCountdownList.astro";
+import { examEvents } from "../data/personal";
+
+const nextExam = [...examEvents]
+  .filter((exam) => new Date(exam.end).getTime() > Date.now())
+  .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())[0];
+---
+
+<MainLayout
+  title="Exams"
+  description="Exam countdown tracker for upcoming assessments."
+>
+  <section class="hero-block section">
+    <p class="eyebrow">Exams</p>
+    <h1>Exam Tracker</h1>
+    <p class="page-intro">
+      Live countdowns for upcoming exams.
+      {nextExam && ` Next exam: ${nextExam.course}.`}
+    </p>
+  </section>
+
+  <section class="section">
+    <SectionHeader
+      title="Upcoming Exams"
+      intro="All exams start at 09:30 BST and run for 2 hours."
+    />
+    <ExamCountdownList exams={examEvents} />
+  </section>
+</MainLayout>

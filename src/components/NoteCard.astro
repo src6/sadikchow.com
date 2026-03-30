@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  post: CollectionEntry<"notes">;
+}
+
+const { post } = Astro.props;
+const formattedDate = post.data.pubDate.toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric"
+});
+const wordCount = post.body.split(/\s+/).length;
+const minutes = Math.max(1, Math.round(wordCount / 200));
+---
+
+<article class="entry-row">
+  <h3>
+    <a href={`/notes/${post.id}/`}>{post.data.title}</a>
+  </h3>
+  <p class="entry-summary">{post.data.description}</p>
+  <p class="entry-meta">
+    <span>{formattedDate}</span>
+    <span> • {minutes} min read</span>
+  </p>
+</article>

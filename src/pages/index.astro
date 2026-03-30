@@ -1,0 +1,50 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../layouts/MainLayout.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import NoteCard from "../components/NoteCard.astro";
+import { siteConfig } from "../data/site";
+import { getPublishedNotes } from "../lib/notes";
+
+const featuredProjects = (await getCollection("projects"))
+  .filter((project) => project.data.featured)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 2);
+
+const recentPosts = (await getPublishedNotes()).slice(0, 2);
+---
+
+<MainLayout title="Home" description={siteConfig.description}>
+  <section class="hero-block section">
+    <p class="eyebrow">Software + writing</p>
+    <h1>Projects and notes</h1>
+    <p class="page-intro">
+      A running collection of what I am building, learning, and thinking through.
+    </p>
+  </section>
+
+  <section class="section">
+    <SectionHeader
+      title="Featured Projects"
+      intro="A quick look at work that combines product thinking, systems depth, and measurable outcomes."
+    />
+    <div class="row-list">
+      {featuredProjects.map((project) => <ProjectCard project={project} />)}
+    </div>
+    <p class="section-tail-link"><a href="/projects">All projects</a></p>
+  </section>
+
+  {recentPosts.length > 0 && (
+    <section class="section">
+      <SectionHeader
+        title="Latest Notes"
+        intro="Recent thoughts, builds, findings, and whatever feels interesting enough to write down."
+      />
+      <div class="row-list">
+        {recentPosts.map((post) => <NoteCard post={post} />)}
+      </div>
+      <p class="section-tail-link"><a href="/notes">All notes</a></p>
+    </section>
+  )}
+</MainLayout>

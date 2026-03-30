@@ -1,0 +1,28 @@
+---
+import { siteConfig } from "../data/site";
+---
+
+<footer>
+  <p>
+    Built with Astro + Markdown. Contact:
+    <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+  </p>
+  <p class="small">© {new Date().getFullYear()} {siteConfig.name}.</p>
+</footer>
+
+<style>
+  footer {
+    margin-top: 1.8rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .small {
+    margin-top: 0.2rem;
+    font-size: 0.82rem;
+  }
+</style>

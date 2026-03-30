@@ -1,0 +1,98 @@
+---
+import { navigation, siteConfig } from "../data/site";
+import DisplayControls from "./DisplayControls.astro";
+
+const pathname = Astro.url.pathname;
+---
+
+<header class="nav-wrap">
+  <div class="top-row">
+    <a class="brand" href="/">{siteConfig.name}</a>
+    <div class="controls-wrap">
+      <DisplayControls />
+    </div>
+  </div>
+  <nav aria-label="Primary">
+    <ul>
+      {
+        navigation.map((item) => (
+          <li>
+            <a class={pathname === item.href ? "active" : ""} href={item.href}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .nav-wrap {
+    width: min(980px, 92vw);
+    margin: 0.5rem auto 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+
+  .brand {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 1.14rem;
+    color: var(--text);
+    text-decoration: none;
+    margin-bottom: 0;
+  }
+
+  nav {
+    margin-top: 0.3rem;
+  }
+
+  .controls-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+
+  li a {
+    font-size: 0.9rem;
+    text-decoration: underline;
+    color: var(--muted);
+  }
+
+  li a:hover,
+  li a.active {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  @media (max-width: 760px) {
+    .nav-wrap {
+      width: min(980px, 94vw);
+    }
+
+    ul {
+      gap: 0.55rem;
+    }
+
+    .top-row {
+      align-items: flex-start;
+    }
+  }
+</style>

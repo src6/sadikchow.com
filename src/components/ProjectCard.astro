@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const formattedDate = project.data.date.toLocaleDateString("en-US", {
+  month: "short",
+  year: "numeric"
+});
+---
+
+<article class="entry-row">
+  <h3>
+    <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+  </h3>
+  <p class="entry-summary">{project.data.summary}</p>
+  <p class="entry-meta">
+    <span>{formattedDate}</span>
+    {project.data.featured && <span> • featured</span>}
+    <span> • {project.data.tech.join(", ")}</span>
+  </p>
+  <p class="entry-links">
+    {project.data.github && (
+      <a href={project.data.github} target="_blank" rel="noreferrer">github</a>
+    )}
+    {project.data.demo && <a href={project.data.demo} target="_blank" rel="noreferrer">demo</a>}
+  </p>
+</article>

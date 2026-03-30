@@ -1,0 +1,22 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<MainLayout title="Projects" description="Selected projects with context, decisions, and outcomes.">
+  <section class="section">
+    <SectionHeader
+      title="Projects"
+      intro="Problem, approach, outcome, and links for each project."
+    />
+    <div class="row-list">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+</MainLayout>

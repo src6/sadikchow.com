@@ -1,0 +1,171 @@
+---
+import type { ExamEvent } from "../data/personal";
+
+interface Props {
+  exams: ExamEvent[];
+}
+
+const { exams } = Astro.props;
+
+const sortedExams = [...exams].sort(
+  (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()
+);
+
+const formatDateTime = (iso: string) =>
+  new Date(iso).toLocaleString("en-GB", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+
+const getCountdownState = (startIso: string, endIso: string) => {
+  const now = Date.now();
+  const start = new Date(startIso).getTime();
+  const end = new Date(endIso).getTime();
+
+  if (now >= end) {
+    return {
+      label: "Completed",
+      countdown: "--",
+      tone: "done"
+    };
+  }
+
+  if (now >= start) {
+    const diff = end - now;
+    const minutes = Math.floor(diff / 60000) % 60;
+    const hours = Math.floor(diff / 3600000);
+
+    return {
+      label: "In progress",
+      countdown: `Ends in ${hours}h ${minutes}m`,
+      tone: "live"
+    };
+  }
+
+  const diff = start - now;
+  const minutes = Math.floor(diff / 60000) % 60;
+  const hours = Math.floor(diff / 3600000) % 24;
+  const days = Math.floor(diff / 86400000);
+
+  const tone = diff <= 24 * 60 * 60 * 1000 ? "urgent" : diff <= 48 * 60 * 60 * 1000 ? "warn" : "neutral";
+
+  return {
+    label: "Upcoming",
+    countdown: `${days}d ${hours}h ${minutes}m`,
+    tone
+  };
+};
+---
+
+<div class="row-list" id="exam-list">
+  {
+    sortedExams.map((exam, index) => {
+      const state = getCountdownState(exam.start, exam.end);
+
+      return (
+        <article class="entry-row exam-row" data-start={exam.start} data-end={exam.end}>
+          <div class="exam-layout">
+            <div class="exam-main">
+              <h3>{exam.course}</h3>
+              <p class="entry-meta">
+                <strong>Starts:</strong> {formatDateTime(exam.start)} BST
+              </p>
+              <p class="entry-meta">
+                <strong>Ends:</strong> {formatDateTime(exam.end)} BST
+              </p>
+              <p class="entry-meta">
+                <strong>Status:</strong>{" "}
+                <span class="exam-status" data-status-id={`status-${index}`}>
+                  {state.label}
+                </span>
+              </p>
+            </div>
+
+            <div class="exam-side">
+              <p class="entry-meta exam-side-label">Countdown</p>
+              <p class="entry-meta">
+                <span class={`exam-countdown countdown-${state.tone}`} data-countdown-id={`countdown-${index}`}>
+                  {state.countdown}
+                </span>
+              </p>
+            </div>
+          </div>
+        </article>
+      );
+    })
+  }
+</div>
+
+<script is:inline>
+  const rows = document.querySelectorAll(".exam-row");
+  const tones = ["countdown-neutral", "countdown-warn", "countdown-urgent", "countdown-live", "countdown-done"];
+
+  const getStatus = (startIso, endIso) => {
+    const now = Date.now();
+    const start = new Date(startIso).getTime();
+    const end = new Date(endIso).getTime();
+
+    if (now >= end) {
+      return {
+        label: "Completed",
+        countdown: "--",
+        tone: "done"
+      };
+    }
+
+    if (now >= start) {
+      const diff = end - now;
+      const minutes = Math.floor(diff / 60000) % 60;
+      const hours = Math.floor(diff / 3600000);
+
+      return {
+        label: "In progress",
+        countdown: `Ends in ${hours}h ${minutes}m`,
+        tone: "live"
+      };
+    }
+
+    const diff = start - now;
+    const minutes = Math.floor(diff / 60000) % 60;
+    const hours = Math.floor(diff / 3600000) % 24;
+    const days = Math.floor(diff / 86400000);
+
+    const tone = diff <= 24 * 60 * 60 * 1000 ? "urgent" : diff <= 48 * 60 * 60 * 1000 ? "warn" : "neutral";
+
+    return {
+      label: "Upcoming",
+      countdown: `${days}d ${hours}h ${minutes}m`,
+      tone
+    };
+  };
+
+  const updateCountdowns = () => {
+    rows.forEach((row) => {
+      const start = row.getAttribute("data-start");
+      const end = row.getAttribute("data-end");
+      if (!start || !end) return;
+
+      const countdownEl = row.querySelector("[data-countdown-id]");
+      if (!countdownEl) return;
+
+      const statusEl = row.querySelector("[data-status-id]");
+      const status = getStatus(start, end);
+
+      countdownEl.textContent = status.countdown;
+      countdownEl.classList.remove(...tones);
+      countdownEl.classList.add(`countdown-${status.tone}`);
+
+      if (statusEl) {
+        statusEl.textContent = status.label;
+      }
+    });
+  };
+
+  updateCountdowns();
+  setInterval(updateCountdowns, 60000);
+</script>

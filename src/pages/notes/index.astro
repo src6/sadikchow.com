@@ -1,0 +1,24 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import NoteCard from "../../components/NoteCard.astro";
+import { getPublishedNotes } from "../../lib/notes";
+
+const posts = await getPublishedNotes();
+---
+
+<MainLayout title="Notes" description="Some recent notes on what I am building, noticing, and thinking about.">
+  <section class="section">
+    <SectionHeader
+      title="Notes"
+      intro="For memory and fun, occasionally serious."
+    />
+    {posts.length > 0 ? (
+      <div class="row-list">
+        {posts.map((post) => <NoteCard post={post} />)}
+      </div>
+    ) : (
+      <p class="page-intro">No notes published yet.</p>
+    )}
+  </section>
+</MainLayout>

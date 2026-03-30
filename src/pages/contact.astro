@@ -1,0 +1,28 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { siteConfig } from "../data/site";
+---
+
+<MainLayout title="Contact" description="Get in touch for internships, collaborations, or engineering discussions.">
+  <section class="section">
+    <h1>Contact</h1>
+    <p class="page-intro">
+      I am looking for internship and new-grad software engineering roles.
+      Email is the fastest path.
+    </p>
+    <ul class="simple-list">
+      <li>
+        <strong>Email:</strong>
+        <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+      </li>
+      <li>
+        <strong>LinkedIn:</strong>
+        <a href={siteConfig.linkedin} target="_blank" rel="noreferrer">{siteConfig.linkedin}</a>
+      </li>
+      <li>
+        <strong>GitHub:</strong>
+        <a href={siteConfig.github} target="_blank" rel="noreferrer">{siteConfig.github}</a>
+      </li>
+    </ul>
+  </section>
+</MainLayout>

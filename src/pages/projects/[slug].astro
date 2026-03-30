@@ -1,0 +1,45 @@
+---
+import { getCollection, render } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import MarkdownProse from "../../components/MarkdownProse.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project }
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const date = project.data.date.toLocaleDateString("en-US", {
+  month: "long",
+  year: "numeric"
+});
+---
+
+<MainLayout title={project.data.title} description={project.data.summary}>
+  <article class="section">
+    <a class="back-link" href="/projects">← Project index</a>
+    <h1>{project.data.title}</h1>
+    <p class="detail-summary">{project.data.summary}</p>
+    <p class="detail-meta">{date} • {project.data.tech.join(", ")}</p>
+    <p class="entry-links">
+      {project.data.github && (
+        <a href={project.data.github} target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+      )}
+      {project.data.demo && (
+        <a href={project.data.demo} target="_blank" rel="noreferrer">
+          Live Demo
+        </a>
+      )}
+    </p>
+    <MarkdownProse />
+    <div class="prose detail-body">
+      <Content />
+    </div>
+  </article>
+</MainLayout>
